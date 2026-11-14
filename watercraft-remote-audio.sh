@@ -4,6 +4,8 @@ CONFIGDIR="$HOME/.config/watercraft-remote-audio"
 mkdir -p "$CONFIGDIR"
 PIDFILE="$CONFIGDIR"/PIDFILE
 
+# NOTE: version 0.1.0 you need to change this unless your remote ssh alias is identical for some reason
+remote="ketch010" # ssh alias or user@addr #TODO source remote from local conf file and or read -p paths to this
 
 
 kill_autostart() {
@@ -17,18 +19,20 @@ kill_autostart() {
 
 
 write_remote_audio_routing() {
-	cat > ~/bin/remote-audio-routing << 'EOF'
+cat > ~/bin/remote-audio-routing <<-EOF
 #!/bin/sh
 # script called by autostart
 # Stream desktop audio to the laptop. Retries every 5 s while the laptop is unreachable.
 while :; do
-    parec -d "$(pactl get-default-sink).monitor" --format=s32le --rate=48000 --channels=2 --latency-msec=20 \
-      | ssh -T -o BatchMode=yes -o ConnectTimeout=5 -o ServerAliveInterval=5 -o ServerAliveCountMax=2 \
-            ketch010 '~/bin/audio-sink'
+    parec -d "$(pactl get-default-sink).monitor" --format=s32le --rate=48000 --channels=2 --latency-msec=20 \\
+      | ssh -T -o BatchMode=yes -o ConnectTimeout=5 -o ServerAliveInterval=5 -o ServerAliveCountMax=2 \\
+            $remote '~/bin/audio-sink'
     sleep 5
 done
 EOF
 }
+
+
 
 make_autostart() {
 	if [[ ! -f ~/bin/remote-audio-routing ]]; then
@@ -83,19 +87,18 @@ EOF
 #Start the stream again.
 }
 
-remote="ketch010" # ssh alias or user@addr #TODO source remote from local conf file and or read -p paths to this
 
 ssh_script_remote() {
 
 	ssh "$remote" 'mkdir -p ~/bin && cat > ~/bin/audio-sink && chmod +x ~/bin/audio-sink' <<'EOF'
-	#!/bin/sh
-	# Play raw 48 kHz s32le stereo from stdin.
-	# Logged in: go through PulseAudio. Not logged in: straight to ALSA.
-	if pactl info >/dev/null 2>&1; then
-	    exec pacat --playback --raw --format=s32le --rate=48000 --channels=2 --latency-msec=300
-	else
-	    exec aplay -q -t raw -f S32_LE -r 48000 -c 2 --buffer-time=300000 -D plughw:CARD=Gen,DEV=0
-	fi
+#!/bin/sh
+# Play raw 48 kHz s32le stereo from stdin.
+# Logged in: go through PulseAudio. Not logged in: straight to ALSA.
+if pactl info >/dev/null 2>&1; then
+    exec pacat --playback --raw --format=s32le --rate=48000 --channels=2 --latency-msec=300
+else
+    exec aplay -q -t raw -f S32_LE -r 48000 -c 2 --buffer-time=300000 -D plughw:CARD=Gen,DEV=0
+fi
 EOF
 }
 
