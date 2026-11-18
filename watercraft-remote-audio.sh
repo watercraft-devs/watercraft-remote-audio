@@ -194,10 +194,10 @@ case "$1" in
 		version
 		exit 0 ;;
 	-h|--help|help)
-		printf "\nUsage: %s [--start||--stop||--remote||autostart[--rm||--kill]||--set-sample-rate]\n" "$0"
+		printf "\nUsage: %s [--start||--stop[--remote]||--remote||autostart[--rm||--kill]||--set-sample-rate]\n" "$0"
                 exit 0 ;;
 	*)
-		printf "\nUsage: %s [--start||--stop||--remote||autostart[--rm||--kill]||--set-sample-rate]\n" "$0" 
+		printf "\nUsage: %s [--start||--stop[--remote]||--remote||autostart[--rm||--kill]||--set-sample-rate]\n" "$0" 
 		exit 1 ;;
 esac
 

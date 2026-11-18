@@ -61,7 +61,7 @@ All commands:
 watercraft-remote-audio 
 
 - `--start`
-- `--stop`
+- `--stop[--remote]`
 - `--remote`
 - `autostart[--rm||--kill]`
 - `--set-sample-rate`
@@ -112,6 +112,19 @@ Manually stops a remote audio stream.
 NOTE: if the setup started with autostart, `--stop` won't work properly.
 
 To stop an autostart, you need to run `autostart --kill`
+
+---
+`--stop --remote`
+---
+
+Manually stop the audio stream on the **remote** side.
+
+This helps with any latency issues that can be experienced after prolonged usage.
+
+Just run `./watercraft-remote-audio --stop --remote && ./watercraft-remote-audio --start`
+
+This creates a fresh ssh session which fixes the latency.
+
 
 ---
 `autostart`
