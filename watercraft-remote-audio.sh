@@ -138,6 +138,18 @@ stop_manual_routing() {
 	printf "Kill the autostart like this:\nwatercraft-remote-audio autostart --kill\n"
 }
 
+stop_remote(){
+	# ssh into remote and stop aplay or pacat
+	if aplay_pid=$(ssh "$remote" 'pgrep -n -x aplay'); then
+		ssh "$remote" "pkill $aplay_pid"
+		ssh "$remote" 'pkill aplay'
+	fi
+	if pacat_pid=$(ssh "$remote" 'pgrep -n -x pacat'); then
+		ssh "$remote" "pkill $pacat_pid"
+		ssh "$remote" 'pkill pacat'
+	fi
+}
+
 
 version() {
 	printf "watercraft-remote-audio version: $VERSION\n"
@@ -146,25 +158,33 @@ version() {
 case "$1" in 
 	--start)
 		start_manual_routing
-		exit 0;;
+		exit 0 ;;
 	--stop)
+		case "$2" in
+			--remote)
+				stop_remote
+				exit 0 ;;
+			*)
+				stop_manual_routing
+				exit 0 ;;
+		esac
 	        stop_manual_routing
 		exit 0 ;;
 	--remote)
 		ssh_script_remote
-		exit 0;;		
+		exit 0 ;;		
 	autostart)
-	case "$2" in
-		--rm)
-			rm_autostart
-			exit 0 ;;
-		--kill)
-			kill_autostart
-			exit 0 ;;
-		*)
-			make_autostart
-			exit 0 ;;
-	esac 
+		case "$2" in
+			--rm)
+				rm_autostart
+				exit 0 ;;
+			--kill)
+				kill_autostart
+				exit 0 ;;
+			*)
+				make_autostart
+				exit 0 ;;
+		esac 
 		make_autostart
 		exit 0 ;;
 	--set-sample-rate)
