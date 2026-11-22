@@ -59,6 +59,7 @@ Options:
 -   --start               `Start a remote audio stream`
 -   --stop                `Stop an ongoing remote audio stream`
 -   --refresh             `Refresh the stream`
+-   --configure           `Setup the remote ssh destination`
 -   --remote              `Send the audio stream listener script to the remote destination`
 -   --remote --stop       `Kills the audio stream listener on the remote destination`
 -   autostart             `Makes it so the audio stream starts automatically at boot`
