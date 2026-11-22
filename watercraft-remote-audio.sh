@@ -180,7 +180,7 @@ version() {
 
 usage() {
   cat <<EOF
-Usage: ${0##*/} [OPTIONS] <source> [dest...]
+Usage: ${0##*/} [OPTIONS] 
 
 Simple high fidelity remote audio over ssh
 

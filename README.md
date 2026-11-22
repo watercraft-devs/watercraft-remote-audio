@@ -51,7 +51,7 @@ watercraft-remote-audio --stop
 ## Usage: 
 
 
-Usage: watercraft-remote-audio [OPTIONS] <source> [dest...]
+Usage: watercraft-remote-audio [OPTIONS] 
 
 Simple high fidelity remote audio over ssh
 
