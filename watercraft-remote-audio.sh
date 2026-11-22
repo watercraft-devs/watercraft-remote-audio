@@ -1,11 +1,20 @@
 #!/bin/bash
-VERSION=0.1.0
+VERSION=0.1.1
 CONFIGDIR="$HOME/.config/watercraft-remote-audio"
 mkdir -p "$CONFIGDIR"
 PIDFILE="$CONFIGDIR"/PIDFILE
+REMOTEPATH="$CONFIGDIR/remote"
 
-# NOTE: version 0.1.0 you need to change this unless your remote ssh alias is identical for some reason
-remote="ketch010" # ssh alias or user@addr #TODO source remote from local conf file and or read -p paths to this
+check_remote() {
+	if [  ! -f "$REMOTEPATH" ]; then 
+		printf "No remote destination set!\nSet it with:\nwatercraft-remote-audio --configure\nand then retry.\n"
+		exit 1 
+	fi
+}
+
+if [ -f "$REMOTEPATH" ]; then 
+	remote=$(cat "$REMOTEPATH")
+fi
 
 
 kill_autostart() {
@@ -19,6 +28,7 @@ kill_autostart() {
 
 
 write_remote_audio_routing() {
+	check_remote
 cat > ~/bin/remote-audio-routing <<-EOF
 #!/bin/sh
 # script called by autostart
@@ -89,7 +99,7 @@ EOF
 
 
 ssh_script_remote() {
-
+	check_remote
 	ssh "$remote" 'mkdir -p ~/bin && cat > ~/bin/audio-sink && chmod +x ~/bin/audio-sink' <<'EOF'
 #!/bin/sh
 # Play raw 48 kHz s32le stereo from stdin.
@@ -104,6 +114,7 @@ EOF
 
 
 start_manual_routing() {
+	check_remote
 	if  ssh "$remote" 'test -x ~/bin/audio-sink'; then
 		printf ""
 	else
@@ -139,6 +150,7 @@ stop_manual_routing() {
 }
 
 stop_remote(){
+	check_remote
 	# ssh into remote and stop aplay or pacat
 	if aplay_pid=$(ssh "$remote" 'pgrep -n -x aplay'); then
 		ssh "$remote" "pkill $aplay_pid"
@@ -150,12 +162,58 @@ stop_remote(){
 	fi
 }
 
+refresh_stream() {
+	check_remote
+	stop_remote
+	start_manual_routing
+}
+
+configure() {
+	read -p "Enter the remote destination (user@ipaddr or ssh-alias): " destination
+	echo "$destination" > "$CONFIGDIR/remote"
+}
+
 
 version() {
 	printf "watercraft-remote-audio version: $VERSION\n"
 }
 
-case "$1" in 
+usage() {
+  cat <<EOF
+Usage: ${0##*/} [OPTIONS] <source> [dest...]
+
+Simple high fidelity remote audio over ssh
+
+Options:
+  --start		Start a remote audio stream
+  --stop		Stop an ongoing remote audio stream
+  --refresh		Refresh the stream 
+  --remote		Send the audio stream listener script to the remote destination
+  --remote --stop	Kills the audio stream listener on the remote destination
+  autostart		Makes it so the audio stream starts automatically at boot
+  autostart --rm	Remove the autostart files so it won't start automatically anymore
+  autostart --kill	Kills the entire setup( manual too). 
+			Only way to stop an autostart right now. A go-to killswitch for the setup.
+  --set-sample-rate	Set sample rate to 48000. (needs more testing)
+  --version		Show the version number.
+  --help		Show the usage screen (this screen).
+
+Quickstart:
+  ${0##*/} --configure 
+  ${0##*/} --remote
+  ${0##*/} --start 
+EOF
+}
+
+# TODO --configure set the remote dest in a file in ~/.config/watercraft-remote-audio/remote
+
+case "$1" in
+	--configure)
+		configure
+		exit 0;;
+	--refresh)
+		refresh_stream
+		exit 0;;
 	--start)
 		start_manual_routing
 		exit 0 ;;
@@ -194,10 +252,10 @@ case "$1" in
 		version
 		exit 0 ;;
 	-h|--help|help)
-		printf "\nUsage: %s [--start||--stop[--remote]||--remote||autostart[--rm||--kill]||--set-sample-rate]\n" "$0"
-                exit 0 ;;
+		usage
+                exit 1 ;;
 	*)
-		printf "\nUsage: %s [--start||--stop[--remote]||--remote||autostart[--rm||--kill]||--set-sample-rate]\n" "$0" 
+		usage
 		exit 1 ;;
 esac
 

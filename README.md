@@ -21,12 +21,6 @@ If you are using any other kind of Linux system and experience issues please fil
 git clone https://github.com/watercraft-devs/watercraft-remote-audio
 # 2. Go to the clone directory
 cd watercraft-remote-audio
-# 3 In this version you need to manually change your destination address:
-# 3.1  Open ./watercraft-remote-audio.sh in your editor of choice
-vim ./watercraft-remote-audio.sh
-# 3.2  Edit the line that says `remote=ketch010` 
-# change `ketch010` to your destination's user@ipaddr or a pre-configured ssh alias for the destination
-# this will be simplified in future versions
 ```
 ## Install
 
@@ -39,11 +33,12 @@ sudo cp ./watercraft-remote-audio.sh /usr/local/bin/watercraft-remote-audio
 watercraft-remote-audio -h
 ```
 
-## Audio Setup
+## Setup 
 
 ```sh
-# 1. Assuming you followed the `Software Setup` section, 
-# setup your remote connection:
+# 1. Set your remote destination. 
+watercraft-remote-audio --configure
+# 2. Send the audio receiver script there.
 watercraft-remote-audio --remote
 # 2. If you want autostart, enable that now too:
 watercraft-remote-audio autostart
@@ -56,16 +51,24 @@ watercraft-remote-audio --stop
 ## Usage: 
 
 
-All commands:
+Usage: ${0##*/} [OPTIONS] <source> [dest...]
 
-watercraft-remote-audio 
+Simple high fidelity remote audio over ssh
 
-- `--start`
-- `--stop[--remote]`
-- `--remote`
-- `autostart[--rm||--kill]`
-- `--set-sample-rate`
-- `-h`
+Options:
+  --start               Start a remote audio stream
+  --stop                Stop an ongoing remote audio stream
+  --refresh             Refresh the stream 
+  --remote              Send the audio stream listener script to the remote destination
+  --remote --stop       Kills the audio stream listener on the remote destination
+  autostart             Makes it so the audio stream starts automatically at boot
+  autostart --rm        Remove the autostart files so it won't start automatically anymore
+  autostart --kill      Kills the entire setup( manual too). 
+                        Only way to stop an autostart right now. A go-to killswitch for the setup.
+  --set-sample-rate     Set sample rate to 48000. (needs more testing)
+  --version             Show the version number.
+  --help                Show the usage screen (this screen).
+
 
 ---
 ### `-h`
@@ -74,9 +77,15 @@ watercraft-remote-audio
 Help: just displays basic usage options at the moment.
 
 ---
+### `--configure` 
+---
+Set your remote destination.
+
+It can be a user@ipaddr or a ssh-alias.
+
+---
 ### `--remote` 
 ---
-(run this first)
 
 This command sets up the `audio-sink` script on your remote destination.
 
@@ -84,18 +93,6 @@ This is necessary before any operation whether manual or autostart.
 
 In this version you need to fill in your remote destination manually: 
 
-
-**IMPORTANT:**
-
-If you did not already, change `remote=ketch010` to `remote=yourRemoteUser@yourRemoteIPAddr`.
-
-You can use a pre-configured ssh alias or `user@ipaddr`. 
-
-If you use it directly from the repo `cd` there and just change it there.
-
-If you already added it to `/usr/local/bin/` either change it directly or change it in  the repo directory and copy it to `/usr/local/bin/` again after the changes.
-
-Future versions will make this simpler.
 
 ---
 `--start`
@@ -125,6 +122,11 @@ Just run `./watercraft-remote-audio --stop --remote && ./watercraft-remote-audio
 
 This creates a fresh ssh session which fixes the latency.
 
+---
+`--refresh`
+---
+
+Refreshes the ssh session by stopping the remote stream and then restarting it from the local system.
 
 ---
 `autostart`
