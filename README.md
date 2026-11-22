@@ -40,11 +40,11 @@ watercraft-remote-audio -h
 watercraft-remote-audio --configure
 # 2. Send the audio receiver script there.
 watercraft-remote-audio --remote
-# 2. If you want autostart, enable that now too:
+# 3. If you want autostart, enable that now too:
 watercraft-remote-audio autostart
-# 3. Start the stream manually:
+# 4. Start the stream manually:
 watercraft-remote-audio --start
-# 4. Stop the stream manually:
+# 5. Stop the stream manually:
 watercraft-remote-audio --stop
 ```
 
