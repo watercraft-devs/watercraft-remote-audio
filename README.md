@@ -56,17 +56,17 @@ Usage: watercraft-remote-audio [OPTIONS]
 Simple high fidelity remote audio over ssh
 
 Options:
--   --start               Start a remote audio stream
--   --stop                Stop an ongoing remote audio stream
--   --refresh             Refresh the stream 
--   --remote              Send the audio stream listener script to the remote destination
--   --remote --stop       Kills the audio stream listener on the remote destination
--   autostart             Makes it so the audio stream starts automatically at boot
--   autostart --rm        Remove the autostart files so it won't start automatically anymore
--   autostart --kill      Kills the entire setup( manual too). Only way to stop an autostart right now. A go-to killswitch for the setup.
--   --set-sample-rate     Set sample rate to 48000. (needs more testing)
--   --version             Show the version number.
--   --help                Show the usage screen (this screen).
+-   --start               `Start a remote audio stream`
+-   --stop                `Stop an ongoing remote audio stream`
+-   --refresh             `Refresh the stream`
+-   --remote              `Send the audio stream listener script to the remote destination`
+-   --remote --stop       `Kills the audio stream listener on the remote destination`
+-   autostart             `Makes it so the audio stream starts automatically at boot`
+-   autostart --rm        `Remove the autostart files so it won't start automatically anymore`
+-   autostart --kill      `Kills the entire setup( manual too). Only way to stop an autostart right now. A go-to killswitch for the setup.`
+-   --set-sample-rate     `Set sample rate to 48000. (needs more testing)`
+-   --version             `Show the version number.`
+-   --help                `Show the usage screen (this screen).`
 
 
 ---
